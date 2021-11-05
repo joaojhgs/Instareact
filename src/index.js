@@ -5,17 +5,50 @@ import './css/timeline.css';
 import './css/login.css';
 import App from './App';
 import Login from './componentes/Login';
-
+import Logout from './componentes/Logout';
 import reportWebVitals from './reportWebVitals';
-import {Route, Switch, BrowserRouter} from 'react-router-dom';
+import {Route, Switch, BrowserRouter, Redirect} from 'react-router-dom';
+
+function verificaAutenticacao(){
+  if(localStorage.getItem('auth-token') != null){
+    return true;
+  }
+}
+
+function logout(){
+    localStorage.removeItem('auth-token');
+    return true;
+}
+
 
 ReactDOM.render(
    <BrowserRouter>
     <div id="main">
           <Switch>
-              <Route exact path="/" component={Login}/>
+              <Route exact path="/" component={Login} render={() => (
+                    verificaAutenticacao() ? (
+                      <Redirect to="/timeline"/>
+                    ) : (
+                      <Redirect to="/"/>
+                    )
+                )}/>
   
-              <Route path="/timeline" component={App}></Route>
+              <Route path="/timeline" render={() => (
+                    verificaAutenticacao() ? (
+                        <App />
+                    ) : (
+                        <Redirect to="/?msg=Voce precisa estar logado para acessar esta pagina!"/>
+                    )
+                )}/>
+
+              <Route path="/logout" render={() => (
+                    logout() ? (
+                      <Redirect to="/?msg=Logout realizado com sucesso!"/>
+                    ) : (
+                        <Redirect to="/?msg=Logout realizado com sucesso!"/>
+
+                    )
+                )}/>
 
           </Switch>
     </div>

@@ -5,11 +5,12 @@ import './css/timeline.css';
 import './css/login.css';
 import App from './App';
 import Login from './componentes/Login';
-import Logout from './componentes/Logout';
 import reportWebVitals from './reportWebVitals';
 import {Route, Switch, BrowserRouter, Redirect} from 'react-router-dom';
 
-function verificaAutenticacao(){
+function verificaAutenticacao(nextState){
+  console.log(nextState);
+
   if(localStorage.getItem('auth-token') != null){
     return true;
   }
@@ -17,6 +18,7 @@ function verificaAutenticacao(){
 
 function logout(){
     localStorage.removeItem('auth-token');
+    localStorage.setItem('error', 'A sessao foi finalizada com sucesso!');
     return true;
 }
 
@@ -25,27 +27,30 @@ ReactDOM.render(
    <BrowserRouter>
     <div id="main">
           <Switch>
-              <Route exact path="/" component={Login} render={() => (
+              <Route exact path="/" render={() => (
                     verificaAutenticacao() ? (
-                      <Redirect to="/timeline"/>
+                      <Redirect to="/timeline/"/>
                     ) : (
-                      <Redirect to="/"/>
+                      <Login/>
                     )
                 )}/>
   
-              <Route path="/timeline" render={() => (
+              <Route exact path="/timeline" render={() => (
                     verificaAutenticacao() ? (
                         <App />
                     ) : (
-                        <Redirect to="/?msg=Voce precisa estar logado para acessar esta pagina!"/>
+                        localStorage.setItem('error', 'Você precisa estar logado para acessar esta pagina!'),
+                        <Redirect to="/"/>
                     )
                 )}/>
+          
+              <Route path="/timeline/:login" component={App}/>
 
               <Route path="/logout" render={() => (
                     logout() ? (
-                      <Redirect to="/?msg=Logout realizado com sucesso!"/>
+                      <Redirect to="/"/>
                     ) : (
-                        <Redirect to="/?msg=Logout realizado com sucesso!"/>
+                        <Redirect to="/"/>
 
                     )
                 )}/>

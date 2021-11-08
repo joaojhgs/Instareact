@@ -1,16 +1,18 @@
 import React, { Component } from 'react';
+import { Redirect } from "react-router-dom";
 
 export default class Login extends Component {
     
     constructor(props){
         super(props);
         console.log(this.props)
-        
-        if(props != null){
-            this.state = {msg:this.props.location.search.replace(/%20/g, " ").replace("?msg=", "")}
+
+        if(localStorage.getItem('error') != null){
+            this.state = {msg:localStorage.getItem('error'), redirect:null}
         } else {
-            this.state = {msg:''}
+            this.state = {msg:'', redirect:null}
         }
+        
     }
 
 
@@ -33,14 +35,19 @@ export default class Login extends Component {
         })
         .then(token => {
             localStorage.setItem('auth-token', token);
-            this.props.history.push("/timeline")
+            localStorage.removeItem('error');
+            this.setState({redirect:"/timeline"});
         })
         .catch(error => {
-            this.setState({msg:error.message})
+            this.setState({msg:error.message});
         })
     }
 
     render(){
+        if (this.state.redirect) {
+            return <Redirect to={this.state.redirect} />
+            
+        }
         return(
             <div className="login-box">
                 <form onSubmit={this.envia.bind(this)}>

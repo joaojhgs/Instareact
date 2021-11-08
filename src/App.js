@@ -5,14 +5,25 @@ import Timeline from './componentes/Timeline';
 
 class App extends Component {
   render() {
-    return (
-    <div id="root">
-      <div className="main">
-        <Header/>
-        <Timeline/>
-      </div>
-    </div>
-    );
+    if(this.props.history == null){
+      return (
+        <div id="root">
+          <div className="main">
+            <Header/>
+            <Timeline/>
+          </div>
+        </div>
+      );
+    } else {
+      return (
+        <div id="root">
+          <div className="main">
+            <Header/>
+            <Timeline login={this.props.match.params.login}/>
+          </div>
+        </div>
+      );
+    }
   }
 }
 

@@ -1,20 +1,27 @@
 import React, { Component } from 'react';
-import PubSub from "pubsub-js"
+import TimelineApi from '../logicas/TimelineApi';
 
 export default class Header extends Component {
 
+    constructor(){
+      super();
+      this.state = {msg:''};
+    }
+
+    componentDidMount(){
+      this.props.store.subscribe(() => {
+        this.setState({msg:this.props.store.getState().notificacao});
+      });
+    }
+
     pesquisa(event){
       event.preventDefault();
-      fetch(`https://instalura-api.herokuapp.com/api/public/fotos/${this.loginPesquisado.value}`)
-      .then(response => response.json())
-      .then(fotos => {
-        PubSub.publish('timeline', fotos);
-      });
+      this.props.store.dispatch(TimelineApi.pesquisa(this.loginPesquisado.value));
     }
 
     render(){
         return (
-        <header className="header container">
+        <header className="header">
           <h1 className="header-logo">
             Instalura
           </h1>
@@ -28,7 +35,8 @@ export default class Header extends Component {
           <nav>
             <ul className="header-nav">
               <li className="header-nav-item">
-                <a href="/#">
+                <span>{this.state.msg}</span>
+                <a href="#">
                   ♡
                   {/*                 ♥ */}
                   {/* Quem deu like nas minhas fotos */}

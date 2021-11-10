@@ -3,10 +3,19 @@ import ReactDOM from 'react-dom';
 import './css/reset.css';
 import './css/timeline.css';
 import './css/login.css';
+import './css/bootstrap.css';
 import App from './App';
 import Login from './componentes/Login';
 import reportWebVitals from './reportWebVitals';
 import {Route, Switch, BrowserRouter, Redirect} from 'react-router-dom';
+import {createStore,applyMiddleware,combineReducers} from 'redux';
+import thunkMiddleware from 'redux-thunk';
+import {timeline} from './reducers/timeline';
+import {notificacao} from './reducers/header';
+
+const reducers = combineReducers({timeline,notificacao});
+const store = createStore(reducers,applyMiddleware(thunkMiddleware));
+
 
 function verificaAutenticacao(nextState){
   console.log(nextState);

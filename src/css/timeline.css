@@ -23,7 +23,7 @@ html,body {
     border-bottom: 2px solid #aaa;
     position: fixed;
     top: 0;
-    width: 80%;
+    width: 100%;
     flex-basis: 100%;
     background: #fff;
     backface-visibility: hidden;
@@ -48,6 +48,7 @@ html,body {
     background: #fafafa;
     border: 1px solid #dbdbdb;
     color: #262626;
+    max-width: 40%;
   }
   
   .header-busca-campo:focus {

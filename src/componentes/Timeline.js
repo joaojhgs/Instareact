@@ -1,52 +1,58 @@
 import React, { Component } from 'react';
 import FotoItem from './FotoItem';
-import PubSub from "pubsub-js"
-
+import TimelineApi from '../logicas/TimelineApi';
 
 export default class Timeline extends Component {
-    
-    constructor(){
-      super();
+
+    constructor(props){
+      super(props);
       this.state = {fotos:[]};
+      this.login = this.props.login;      
     }
 
     componentWillMount(){
-      PubSub.subscribe('timeline',(topico, fotos) => {
-          this.setState({fotos});
+      this.props.store.subscribe(() => {        
+        this.setState({fotos:this.props.store.getState().timeline});
       })
     }
 
+    carregaFotos(){  
+      let urlPerfil;
 
-    componentDidMount(){
-      this.carregaFotos(this.props);
+      if(this.login === undefined) {
+        urlPerfil = `https://instalura-api.herokuapp.com/api/fotos?X-AUTH-TOKEN=${localStorage.getItem('auth-token')}`;
+      } else {
+        urlPerfil = `https://instalura-api.herokuapp.com/api/public/fotos/${this.login}`;
+      } 
+
+      this.props.store.dispatch(TimelineApi.lista(urlPerfil));                  
     }
 
-    carregaFotos(props){
-      let urlPerfil;
-      if(props.login === undefined){
-        urlPerfil = `https://instalura-api.herokuapp.com/api/fotos?X-AUTH-TOKEN=${localStorage.getItem('auth-token')}`
-      } else {
-        urlPerfil = `https://instalura-api.herokuapp.com/api/public/fotos/${props.login}`
-      }
-      fetch(urlPerfil)
-      .then(response => response.json())
-      .then(fotos =>{
-        this.setState({fotos:fotos});
-      });
+    componentDidMount(){
+      this.carregaFotos();
     }
 
     componentWillReceiveProps(nextProps){
       if(nextProps.login !== undefined){
-        this.carregaFotos(nextProps);
+        this.login = nextProps.login;
+        this.carregaFotos();
       }
+    }
+
+    like(fotoId) {
+      this.props.store.dispatch(TimelineApi.like(fotoId));
+    }
+
+    comenta(fotoId,textoComentario) {
+      this.props.store.dispatch(TimelineApi.comenta(fotoId,textoComentario));
     }
 
     render(){
         return (
         <div className="fotos container">
-         {
-           this.state.fotos.map(foto => <FotoItem key={foto.id} foto={foto}/>)
-         }
+            {
+              this.state.fotos.map(foto => <FotoItem key={foto.id} foto={foto} like={this.like.bind(this)} comenta={this.comenta.bind(this)}/>)
+            }
         </div>            
         );
     }
